@@ -27,10 +27,10 @@ setup(
     maintainer_email="adam@talsma.ca",
     packages=["kezmenu3"],
     install_requires=[],  # TODO: pygame + other dep resolution
-    url="https://gitlab.com/a-tal/kezmenu3",
+    url="https://github.com/a-tal/kezmenu3",
     description="KezMenu3 is a KezMenu fork for Python2 and 3.",
     long_description="KezMenu is a GPL PyGame menu library",
-    download_url="https://gitlab.com/a-tal/kezmenu3",
+    download_url="https://github.com/a-tal/kezmenu3",
     license="GPL",
     classifiers=[  # TODO: classifiers
         "Programming Language :: Python",
