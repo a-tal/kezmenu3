@@ -1,1 +1,1 @@
-from kezmenu3.kezmenu import KezMenu
+from kezmenu3.kezmenu import KezMenu  # nopep8
