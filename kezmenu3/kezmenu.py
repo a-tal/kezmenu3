@@ -16,7 +16,7 @@ from .kezmenu_effects import KezMenuEffectAble
 
 __author__ = "Keul - lucafbb AT gmail.com"
 __maintainer__ = "Adam Talsma <adam@talsma.ca>"
-__version__ = "0.3.7"
+__version__ = "0.3.6"
 
 __description__ = "A simple Pygame menu library"
 

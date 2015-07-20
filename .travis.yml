@@ -1,0 +1,44 @@
+
+language: python
+
+python:
+  - "2.7"
+  - "3.4"
+
+before_install:
+  - pip install --upgrade flake8
+
+script:
+  - flake8 kezmenu3/
+
+before_deploy:
+  - python setup.py build sdist bdist_wheel
+  - if [ "x" == "$(grep $(git tag -l --points-at=HEAD) kezmenu3/kezmenu.py)x" ]; then echo 'new tag does not exist in kezmenu3/kezmenu.py; bailing!'; exit 1; else echo "tag found in kezmenu3/kezmenu.py"; fi
+
+deploy:
+  - provider: pypi
+    user: atal
+    skip_cleanup: true
+    distributions: "sdist bdist_wheel"
+    password:
+      secure: "YjuJC8R9FbRGcQuxbdNGZ1fmRZmK2smZiqdm0wfp2OfmqgtiAB8n3y8GQqiY/jClnKKuTKdqInfBobvsbM3BYLNAyynQGeC/vQ0icp+5EwwuBqxmVcZklrznqfIh29myJp6VwIPA88J/3fKe05atxnTo9ClgLc7g1O7pPDtc7gE="
+    on:
+      tags: true
+      repo: a-tal/kezmenu3
+      condition: $TRAVIS_PYTHON_VERSION = "3.4"
+
+  - provider: releases
+    api_key:
+      secure: "bAasQPUKsimMo11Ftbt/SzET4n0QhAitD7cKPvihHXJVt8N8CxsurXFiIka4b8HomrxFpvaWVfpXvHRsUgkJjaL8k3ctoX700VXaygP0lzrJB2y1r3FnG54VJYjabP3KjsqJZPxw2+zwSnDdTKQLgr9W5gOVcGTp3UahgVnrYVg="
+    file: "/home/travis/build/a-tal/kezmenu3/dist/*.whl"
+    file_glob: true
+    skip_cleanup: true
+    on:
+      tags: true
+      condition: $TRAVIS_PYTHON_VERSION = "3.4"
+
+notifications:
+  irc:
+    channels: "irc.freenode.org#atal-dev"
+    on_success: change
+    on_failure: change
