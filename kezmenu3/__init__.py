@@ -1,2 +1,1 @@
-from .kezmenu import KezMenu, runTests
-from .kezmenu import __version__, __description__
+from kezmenu3.kezmenu import KezMenu

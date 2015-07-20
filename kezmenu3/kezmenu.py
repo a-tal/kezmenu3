@@ -11,12 +11,15 @@
 import pygame
 import warnings
 
-from .kezmenu_effects import KezMenuEffectAble, VALID_EFFECTS
+from .kezmenu_effects import KezMenuEffectAble
+
 
 __author__ = "Keul - lucafbb AT gmail.com"
-__version__ = "0.3.5"
+__maintainer__ = "Adam Talsma <adam@talsma.ca>"
+__version__ = "0.3.7"
 
-__description__ = "A simple and basical Pygame library for fast develop of menu interfaces"
+__description__ = "A simple Pygame menu library"
+
 
 class deprecated(object):
     """A decorator for deprecated functions"""
@@ -29,11 +32,16 @@ class deprecated(object):
         """Log out the deprecation message, but only once"""
         if not self._printed:
             def wrapped_func(*args):
-                warnings.warn(self._msg % func.__name__, DeprecationWarning, stacklevel=3)
+                warnings.warn(
+                    self._msg % func.__name__,
+                    DeprecationWarning,
+                    stacklevel=3,
+                )
                 func(*args)
             self._printed = True
             return wrapped_func
         return func
+
 
 class KezMenu(KezMenuEffectAble):
     """A simple but complete class to handle menu using Pygame"""
@@ -46,20 +54,19 @@ class KezMenu(KezMenuEffectAble):
         self.options = [{'label': x[0], 'callable': x[1]} for x in options]
         self.x = 0
         self.y = 0
-        self.screen_topleft_offset = (0,0)
+        self.screen_topleft_offset = (0, 0)
         self.option = 0
         self.width = 0
         self.height = 0
         self.color = (0, 0, 0, 0)
         self.focus_color = (255, 0, 0, 255)
         self.mouse_enabled = True
-        self.mouse_focus = False
-        # The 2 lines below seem stupid, but for effects I can need different font for every line.
+        self.mouse_pos = (0, 0)
         try:
             self._font = None
             self.font = pygame.font.Font(None, 32)
             self._fixSize()
-        except: # needed for fixing the common issues if the module is used in a py2exe app
+        except:
             pass
 
     def _fixSize(self):
@@ -71,7 +78,7 @@ class KezMenu(KezMenuEffectAble):
             ren = font.render(text, 1, (0, 0, 0))
             if ren.get_width() > self.width:
                 self.width = ren.get_width()
-            self.height+=font.get_height()
+            self.height += font.get_height()
 
     def draw(self, surface):
         """Blit the menu to a surface."""
@@ -87,7 +94,7 @@ class KezMenu(KezMenuEffectAble):
             if o != first and o.get('padding_line', 0):
                 offset += o['padding_line']
 
-            font = o.get('font',self._font)
+            font = o.get('font', self._font)
             if i == self.option and self.focus_color:
                 clr = self.focus_color
             else:
@@ -111,9 +118,9 @@ class KezMenu(KezMenuEffectAble):
 
     def update(self, events, time_passed=None):
         """Update the menu and get input for the menu.
+
         @events: the pygame catched events
-        @time_passed: optional parameter, only used for animations. The time passed (in seconds) from the last
-                      update call (commonly obtained from a call on pygame.Clock.tick)
+        @time_passed: delta time since the last call
         """
         for e in events:
             if e.type == pygame.QUIT:
@@ -131,11 +138,11 @@ class KezMenu(KezMenuEffectAble):
             # Mouse controls
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 lb, cb, rb = pygame.mouse.get_pressed()
-                if lb and self.mouse_focus:
+                if lb:
                     self.options[self.option]['callable']()
         # Menu limits
-        if self.option > len(self.options)-1:
-            self.option = len(self.options)-1
+        if self.option > len(self.options) - 1:
+            self.option = len(self.options) - 1
         elif self.option < 0:
             self.option = 0
         # Check for mouse position
@@ -147,38 +154,40 @@ class KezMenu(KezMenuEffectAble):
     def _checkMousePositionForFocus(self):
         """Check the mouse position to know if move focus on a option"""
         i = 0
-        mouse_pos = pygame.mouse.get_pos()
-        ml,mt = self.position
+        cur_pos = pygame.mouse.get_pos()
+        ml, mt = self.position
         for o in self.options:
             rect = o.get('label_rect')
             if rect:
-                if rect.collidepoint(mouse_pos):
+                if rect.collidepoint(cur_pos) and self.mouse_pos != cur_pos:
                     self.option = i
-                    self.mouse_focus = True
+                    self.mouse_pos = cur_pos
                     break
-            i+=1
-        else:
-            self.mouse_focus = False
+            i += 1
 
     def _setPosition(self, position):
         x, y = position
         self.x = x
         self.y = y
-    position = property(lambda self: (self.x,self.y), _setPosition, doc="""The menu position inside the container""")
+    position = property(
+        lambda self: (self.x, self.y),
+        _setPosition,
+        doc="The menu position inside the container",
+    )
 
     def _setFont(self, font):
         self._font = font
         for o in self.options:
             o['font'] = font
         self._fixSize()
-    font = property(lambda self: self._font, _setFont, doc="""Font used by the menu""")
+    font = property(
+        lambda self: self._font,
+        _setFont,
+        doc="Font used by the menu",
+    )
 
     def center_at(self, x, y):
         """Center the menu at x, y"""
 
         self.x = x - (self.width / 2)
         self.y = y - (self.height / 2)
-
-
-def runTests():
-    import tests
