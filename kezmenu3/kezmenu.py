@@ -64,7 +64,7 @@ class KezMenu(KezMenuEffectAble):
         self.mouse_pos = (0, 0)
         try:
             self._font = None
-            self.font = pygame.font.Font(None, 32)
+            self.font = pygame.font.SysFont("arial", 32)
             self._fixSize()
         except:
             pass
